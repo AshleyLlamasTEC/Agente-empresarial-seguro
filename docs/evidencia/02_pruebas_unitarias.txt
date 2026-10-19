@@ -1,0 +1,14 @@
+PRUEBAS UNITARIAS
+Comando: python -X utf8 -m unittest discover -s tests -t .
+
+python : ..................................................................................................
+En C:\trabajo\temp\opencode\generar_evidencia.ps1: 48 Carácter: 9
++ $out = (python -X utf8 -m unittest discover -s tests -t . 2>&1 | Out- ...
++         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (.................................:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+----------------------------------------------------------------------
+Ran 98 tests in 0.516s
+
+OK

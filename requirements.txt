@@ -1,0 +1,13 @@
+# El Agente Empresarial Seguro no requiere dependencias externas.
+# Usa unicamente la libreria estandar de Python (3.10+).
+#
+#   urllib.request  -> cliente HTTP hacia Ollama en 127.0.0.1
+#   subprocess      -> ejecucion de comandos de la lista blanca
+#   hashlib, json   -> bitacora de auditoria encadenada
+#
+# Por diseno no hay requirements que instalar: reduce la superficie de
+# ataque y facilita la revision por parte de auditoria.
+#
+# Ollama (no es paquete de Python) se instala aparte:
+#   https://ollama.com/download
+#   ollama pull qwen2.5-coder:7b

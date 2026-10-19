@@ -1,0 +1,48 @@
+DIAGNOSTICO DEL ENTORNO
+Comando: python -X utf8 -m agent.cli doctor --profile consulta
+
+========================================================================
+AGENTE EMPRESARIAL SEGURO v1.1.0 - DIAGNOSTICO DE CUMPLIMIENTO
+========================================================================
+
+[1] Python: 3.13.14
+    [ok] Version compatible.
+
+[2] Perfil
+    [ok] 'consulta' cargado. Modo: SOLO LECTURA
+    [ok] Modelo declarado: qwen2.5-coder:7b (validado como local)
+    [ok] Escritura: False | Shell: False | Confirmacion humana: True
+    [ok] Lista blanca de comandos: 0 ejecutables
+
+[3] Poliza de datos (modelo local)
+    [ok] Host validado como loopback: http://127.0.0.1:11434
+    [ok] Modelo aceptado: qwen2.5-coder:7b
+    [ok] Ollama responde.
+    [ok] El modelo qwen2.5-coder:7b esta descargado.
+
+[4] Workspace
+    [ok] Existe y es directorio: C:\trabajo\pruebas\proyecto-prueba
+    [i] No es un repositorio git.
+    [ok] Sin archivos de credenciales detectados en el workspace.
+
+[5] Bitacora
+    [ok] Directorio de bitacora accesible: C:\trabajo\pruebas\auditoria
+
+[6] Aislamiento de red recomendado (verificacion manual)
+    [ ] La maquina no tiene VPN ni acceso a produccion.
+    [ ] El proyecto es una COPIA, no un recurso compartido de red.
+    [ ] No hay credenciales reales de produccion en esta maquina.
+    [ ] Salida de red restringida salvo 127.0.0.1:11434.
+
+[7] Identidad
+    [i] Sin identidad configurada (estado en blanco):
+        el agente no conoce su nombre ni datos de la persona.
+        Configura con: python -m agent.cli setup
+
+[8] Base de datos local
+    [i] Este perfil no permite base de datos.
+        Para pruebas con BD usa el perfil 'datos'.
+
+========================================================================
+RESULTADO: OK. El agente puede operar bajo este perfil.
+========================================================================

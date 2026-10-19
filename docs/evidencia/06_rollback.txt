@@ -1,0 +1,42 @@
+ROLLBACK DE LA SESION DE ESCRITURA
+Fecha: 2026-10-18T20:35:34.8028729-07:00
+
+=== 1) PLAN DE ROLLBACK (--list) ===
+========================================================================
+ROLLBACK - restaurar desde los respaldos de la bitacora
+========================================================================
+[i] Sesion por defecto (la mas reciente): 20261019T033530Z
+
+PLAN DE ROLLBACK
+------------------------------------------------------------------------
+  RESTAURAR C:\trabajo\pruebas\proyecto-prueba\app.js   (respaldo: app.js.20261019T033532905571.bak)
+------------------------------------------------------------------------
+[i] Solo listado (--list). No se cambio nada.
+
+=== 2) RESTAURACION (confirmada con 's') ===
+========================================================================
+ROLLBACK - restaurar desde los respaldos de la bitacora
+========================================================================
+[i] Sesion por defecto (la mas reciente): 20261019T033530Z
+
+PLAN DE ROLLBACK
+------------------------------------------------------------------------
+  RESTAURAR C:\trabajo\pruebas\proyecto-prueba\app.js   (respaldo: app.js.20261019T033532905571.bak)
+------------------------------------------------------------------------
+[i] Bitacora del rollback: C:\trabajo\pruebas\auditoria\20261019T033534Z-rollback-23756.jsonl
+
+======================================================================
+CONFIRMACION REQUERIDA
+----------------------------------------------------------------------
+RESTAURAR C:\trabajo\pruebas\proyecto-prueba\app.js
+  escrituras deshechas: 1
+  hash actual:  545cdec6ee20a04612502cffdcaeb1f6db04c64e9f2be293d65116e107069ab0
+  hash destino: 10d9b7044c20be0c7035a707ba4aa01202bd713d82fd91f1f80bd60c2f58951f
+----------------------------------------------------------------------
+Aplicar? [s/N]: 
+RESUMEN
+  aplicadas: 1 | omitidas: 0
+  [ok] restore: C:\trabajo\pruebas\proyecto-prueba\app.js
+
+--- estado del archivo tras el rollback ---
+for (let i = 0; i <= valores.length; i++) { // DEFECTO: debe ser <, no <=

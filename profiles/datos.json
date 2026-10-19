@@ -1,0 +1,43 @@
+{
+  "name": "datos",
+  "description": "Corrige codigo y prueba contra una base de datos LOCAL. Escritura en archivos y consultas SQL, cada una con confirmacion humana. La base de datos es de solo lectura salvo que lo habilites con --db-write.",
+  "model": "qwen2.5-coder:7b",
+  "allow_write": true,
+  "allow_shell": true,
+  "require_confirmation": true,
+  "max_iterations": 20,
+  "max_file_bytes": 400000,
+  "max_output_chars": 16000,
+  "command_timeout_seconds": 120,
+  "commands_allow": [
+    "git", "rg", "grep", "findstr", "ls", "dir", "cat", "type", "head", "tail",
+    "wc", "tree", "echo", "node", "npm", "npx", "python", "py", "pytest"
+  ],
+  "commands_deny": [
+    "\\bnpm\\s+(install|i|ci|update|add)\\b",
+    "\\bpnpm\\s+(install|add|update)\\b",
+    "\\byarn\\s+(install|add|upgrade)\\b",
+    "\\bcomposer\\s+(install|update|require)\\b",
+    "\\bdotnet\\s+restore\\b",
+    "\\bcargo\\s+(add|install|update)\\b",
+    "\\bgo\\s+(get|install)\\b",
+    "\\bnpm\\s+link\\b",
+    "\\bnpm\\s+exec\\b"
+  ],
+  "path_deny_names": [
+    ".env", ".env.*", "*.env", "*.pem", "*.key", "*.pfx", "*.p12", "*.jks",
+    "*.keystore", "id_rsa", "id_rsa.*", "id_ed25519", "id_dsa", ".npmrc",
+    ".netrc", ".pgpass", ".my.cnf", ".git-credentials", ".htpasswd",
+    "credentials", "credentials.*", "secrets.*", "*.kdbx", "*.ovpn",
+    "appsettings.production.json", "appsettings.prod.json", "wp-config.php",
+    "local.settings.json", "*.publishsettings"
+  ],
+  "path_deny_globs": [
+    "*production*", "*.prod.env", "**/.ssh/**", "**/.aws/**", "**/.gnupg/**",
+    "**/.kube/**"
+  ],
+  "allow_db": true,
+  "db_read_only": true,
+  "db_allow_ddl": false,
+  "db_max_rows": 200
+}

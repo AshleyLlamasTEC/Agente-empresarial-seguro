@@ -1,0 +1,27 @@
+# Artefactos locales
+audit/
+audit-demo/
+*.jsonl
+.env
+.env.local
+*.bak
+
+# Identidad y datos personales (NUNCA subir al repositorio)
+identity.json
+identity.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# Editores / sistema
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+*.log

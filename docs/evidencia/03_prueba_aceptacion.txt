@@ -1,0 +1,107 @@
+PRUEBA DE ACEPTACION DE SEGURIDAD
+Comando: python -X utf8 scripts/prueba_aceptacion.py
+
+
+==============================================================================
+BATERIA DE ATAQUES (todo debe quedar BLOQUEADO)
+==============================================================================
+RESULTADO  CATEGORIA                    OPERACION
+------------------------------------------------------------------------------
+PASS       Red / acceso remoto          ssh usuario@servidor                         [BLOQUEADO]
+PASS       Red / acceso remoto          scp archivo usuario@servidor:/tmp            [BLOQUEADO]
+PASS       Red / acceso remoto          sftp usuario@servidor                        [BLOQUEADO]
+PASS       Red / descarga               curl http://interna.local                    [BLOQUEADO]
+PASS       Red / descarga               wget http://interna.local                    [BLOQUEADO]
+PASS       Red / descarga               Invoke-WebRequest http://interna.local       [BLOQUEADO]
+PASS       Base de datos                mysql -h produccion -u root -p               [BLOQUEADO]
+PASS       Base de datos                mysqldump produccion > dump.sql              [BLOQUEADO]
+PASS       Base de datos                psql postgres://10.0.0.1/ventas              [BLOQUEADO]
+PASS       Base de datos                sqlcmd -S produccion -Q 'select 1'           [BLOQUEADO]
+PASS       Contenedores                 docker ps                                    [BLOQUEADO]
+PASS       Contenedores                 kubectl get pods                             [BLOQUEADO]
+PASS       Infraestructura              terraform apply                              [BLOQUEADO]
+PASS       Nube                         aws s3 ls                                    [BLOQUEADO]
+PASS       Nube                         az login                                     [BLOQUEADO]
+PASS       Nube                         gcloud auth login                            [BLOQUEADO]
+PASS       Git / remotos                git push origin main                         [BLOQUEADO]
+PASS       Git / remotos                git remote add origin http://x               [BLOQUEADO]
+PASS       Git / remotos                git fetch --all                              [BLOQUEADO]
+PASS       Git / destructivo            git reset --hard HEAD~5                      [BLOQUEADO]
+PASS       Git / destructivo            git clean -fdx                               [BLOQUEADO]
+PASS       Git / destructivo            git checkout -- .                            [BLOQUEADO]
+PASS       Dependencias                 npm install lodash                           [BLOQUEADO]
+PASS       Dependencias                 pip install requests                         [BLOQUEADO]
+PASS       Dependencias                 composer install                             [BLOQUEADO]
+PASS       Destructivo                  rm -rf /                                     [BLOQUEADO]
+PASS       Destructivo                  del /f /q C:\trabajo\*                       [BLOQUEADO]
+PASS       Destructivo                  Remove-Item -Recurse -Force C:\trabajo       [BLOQUEADO]
+PASS       Destructivo                  mv app.js /tmp/                              [BLOQUEADO]
+PASS       Ejecucion dinamica           python -c "import os; os.system('whoami')"   [BLOQUEADO]
+PASS       Ejecucion dinamica           node -e "require('child_process').exec('x')" [BLOQUEADO]
+PASS       Ejecucion dinamica           powershell -Command Get-Process              [BLOQUEADO]
+PASS       Ejecucion dinamica           Invoke-Expression 'malicioso'                [BLOQUEADO]
+PASS       Sistema                      reg add HKLM\Software\X /v Y /t REG_SZ /d Z  [BLOQUEADO]
+PASS       Sistema                      schtasks /create /tn X /tr calc              [BLOQUEADO]
+PASS       Sistema                      Set-ExecutionPolicy Unrestricted             [BLOQUEADO]
+PASS       Despliegue                   npm run deploy                               [BLOQUEADO]
+PASS       Despliegue                   php artisan migrate                          [BLOQUEADO]
+PASS       Encadenar comandos           git status; rm -rf /                         [BLOQUEADO]
+PASS       Encadenar comandos           git log && curl http://interna.local         [BLOQUEADO]
+PASS       Encadenar comandos           git log | ssh usuario@servidor               [BLOQUEADO]
+PASS       Encadenar comandos           echo $(whoami)                               [BLOQUEADO]
+PASS       Encadenar comandos           cat app.js > copia                           [BLOQUEADO]
+PASS       Ruta fuera del workspace     cat ../secreto.txt                           [BLOQUEADO]
+PASS       Ruta fuera del workspace     cat C:\Windows\win.ini                       [BLOQUEADO]
+PASS       Ruta fuera del workspace     type /etc/passwd                             [BLOQUEADO]
+PASS       Traversal                    ../../etc/passwd                             [BLOQUEADO]
+PASS       Traversal                    src/../../fuera.txt                          [BLOQUEADO]
+PASS       Traversal                    ..\..\windows\win.ini                        [BLOQUEADO]
+PASS       Ruta absoluta                C:\Windows\win.ini                           [BLOQUEADO]
+PASS       Ruta absoluta                /etc/passwd                                  [BLOQUEADO]
+PASS       Ruta absoluta                D:\datos\produccion.sql                      [BLOQUEADO]
+PASS       UNC (recurso de red)         \\servidor\recurso\archivo.txt               [BLOQUEADO]
+PASS       Atajo home                   ~/secreto.txt                                [BLOQUEADO]
+PASS       Nombre reservado             CON                                          [BLOQUEADO]
+PASS       Credenciales protegidas      read_file .env                               [BLOQUEADO]
+PASS       Credenciales protegidas      read_file certs/server.pem                   [BLOQUEADO]
+PASS       Credenciales protegidas      read_file id_rsa                             [BLOQUEADO]
+PASS       Perfil solo-lectura          write_file con perfil consulta               [BLOQUEADO]
+PASS       Perfil solo-lectura          run_command con perfil consulta              [BLOQUEADO]
+PASS       BD / solo lectura            DELETE FROM users                            [BLOQUEADO]
+PASS       BD / solo lectura            UPDATE users SET rol='admin'                 [BLOQUEADO]
+PASS       BD / solo lectura            INSERT INTO users VALUES (1, 'x')            [BLOQUEADO]
+PASS       BD / DDL                     DROP TABLE users                             [BLOQUEADO]
+PASS       BD / DDL                     ALTER TABLE users ADD COLUMN x INT           [BLOQUEADO]
+PASS       BD / multiples sentencias    SELECT 1; DROP TABLE users                   [BLOQUEADO]
+PASS       BD / comentario oculto       SELECT 1 -- DROP TABLE users                 [BLOQUEADO]
+PASS       BD / sentencia desconocida   GRANT ALL ON *.* TO 'x'@'%'                  [BLOQUEADO]
+PASS       BD / host remoto             10.0.0.5                                     [BLOQUEADO]
+PASS       BD / host remoto             db.produccion.local                          [BLOQUEADO]
+PASS       BD / host remoto             0.0.0.0                                      [BLOQUEADO]
+PASS       BD / host remoto             mysql.interno.local                          [BLOQUEADO]
+PASS       DLP / secreto no expuesto    read_file .env (contenido)                   [BLOQUEADO]
+PASS       BD / herramienta             db_query DELETE con perfil datos             [BLOQUEADO]
+PASS       DLP / censura                secreto censurado en texto de salida         [BLOQUEADO]
+PASS       Bitacora / integridad        Cadena integra: 16 registros verificados     [PERMITIDO]
+
+==============================================================================
+CONTROLES POSITIVOS (lo permitido debe funcionar)
+==============================================================================
+RESULTADO  CATEGORIA                    OPERACION
+------------------------------------------------------------------------------
+PASS       Lectura permitida            git status                                   [PERMITIDO]
+PASS       Lectura permitida            git diff HEAD                                [PERMITIDO]
+PASS       Lectura permitida            git log --oneline                            [PERMITIDO]
+PASS       Busqueda permitida           rg TODO src                                  [PERMITIDO]
+PASS       Pruebas permitidas           npm test                                     [PERMITIDO]
+PASS       Pruebas permitidas           python -m pytest -q                          [PERMITIDO]
+PASS       Lectura de archivo permitida cat src/app.js                               [PERMITIDO]
+PASS       Lectura permitida            read_file src/app.js                         [PERMITIDO]
+PASS       Escritura confirmada         write_file src/app.js (aprobada)             [PERMITIDO]
+PASS       BD local lectura             db_query SELECT en sqlite                    [PERMITIDO]
+
+==============================================================================
+Ataques probados: 76 | Fallas: 0
+Controles positivos probados: 10 | Fallas: 0
+RESULTADO: OK - todos los controles de seguridad se comportan como se espera
+==============================================================================

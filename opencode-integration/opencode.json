@@ -1,0 +1,43 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "share": "disabled",
+  "autoupdate": false,
+  "snapshot": false,
+
+  "model": "ollama/qwen2.5-coder:7b",
+  "small_model": "ollama/qwen2.5-coder:7b",
+
+  "enabled_providers": ["ollama"],
+  "disabled_providers": [
+    "anthropic", "openai", "google", "openrouter", "groq", "mistral",
+    "deepseek", "xai", "cerebras", "togetherai", "amazon-bedrock",
+    "azure", "github-copilot", "opencode"
+  ],
+
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": {
+        "baseURL": "http://127.0.0.1:11434/v1"
+      },
+      "models": {
+        "qwen2.5-coder:7b": { "name": "Qwen2.5 Coder 7B (local)" }
+      }
+    }
+  },
+
+  "permission": {
+    "edit": "deny",
+    "bash": { "*": "deny" },
+    "webfetch": "deny",
+    "websearch": "deny",
+    "task": "deny",
+    "external_directory": { "*": "deny" },
+    "skill": "deny"
+  },
+
+  "formatter": false,
+  "lsp": false
+}

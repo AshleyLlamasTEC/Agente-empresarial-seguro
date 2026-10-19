@@ -1,0 +1,35 @@
+{
+  "name": "consulta",
+  "description": "Analisis de solo lectura. Diagnostica, explica y propone cambios sin tocar el workspace ni ejecutar comandos.",
+  "model": "qwen2.5-coder:7b",
+  "allow_write": false,
+  "allow_shell": false,
+  "require_confirmation": true,
+  "max_iterations": 14,
+  "max_file_bytes": 200000,
+  "max_output_chars": 12000,
+  "command_timeout_seconds": 30,
+  "commands_allow": [],
+  "commands_deny": [
+    "\\bnpm\\s+(install|i|ci|update|add)\\b",
+    "\\bpnpm\\s+(install|add|update)\\b",
+    "\\byarn\\s+(install|add|upgrade)\\b",
+    "\\bcomposer\\s+(install|update|require)\\b",
+    "\\bdotnet\\s+restore\\b",
+    "\\bcargo\\s+(add|install|update)\\b",
+    "\\bgo\\s+(get|install)\\b",
+    "\\bnpx\\b"
+  ],
+  "path_deny_names": [
+    ".env", ".env.*", "*.env", "*.pem", "*.key", "*.pfx", "*.p12", "*.jks",
+    "*.keystore", "id_rsa", "id_rsa.*", "id_ed25519", "id_dsa", ".npmrc",
+    ".netrc", ".pgpass", ".my.cnf", ".git-credentials", ".htpasswd",
+    "credentials", "credentials.*", "secrets.*", "*.kdbx", "*.ovpn",
+    "appsettings.production.json", "appsettings.prod.json", "wp-config.php",
+    "local.settings.json", "*.publishsettings"
+  ],
+  "path_deny_globs": [
+    "*production*", "*.prod.env", "**/.ssh/**", "**/.aws/**", "**/.gnupg/**",
+    "**/.kube/**"
+  ]
+}

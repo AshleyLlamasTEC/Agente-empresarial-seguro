@@ -1,0 +1,17 @@
+Todos los derechos reservados.
+
+AGENTE EMPRESARIAL SEGURO - USO INTERNO
+
+Este software y su documentacion son de uso interno y confidencial.
+Su finalidad es asistir en el analisis y correccion de codigo sobre una
+COPIA de trabajo, con aislamiento estricto y bitacora de auditoria.
+
+Queda prohibido:
+  - Ejecutarlo contra sistemas de produccion.
+  - Conectarlo a recursos compartidos de red o bases de datos productivas.
+  - Modificar o deshabilitar los controles de seguridad aqui implementados
+    (sandbox, politica de comandos, proteccion de datos, bitacora).
+  - Utilizar modelos remotos o en la nube con informacion de la empresa.
+
+Cualquier cambio en los controles de seguridad debe pasar por revision y
+quedar documentado en docs/ antes de su uso.
