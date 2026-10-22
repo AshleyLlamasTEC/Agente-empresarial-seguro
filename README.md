@@ -86,8 +86,11 @@ python -m agent.cli ask --profile datos --workspace C:\trabajo\copia `
 
 - Solo hosts locales (`127.0.0.1`, `localhost`, `::1`); los remotos se bloquean.
 - Una sola sentencia, sin comentarios; el dry-run no toca la base.
+- Se bloquean funciones que leen/escriben archivos (`LOAD_FILE`, `INTO OUTFILE`),
+  las que agotan el servidor (`SLEEP`, `BENCHMARK`) y la escritura escondida en
+  CTEs (`WITH ... DELETE`). En MySQL la sentencia debe ser una sola linea y sin `\`.
 - El SELECT se limita a `db_max_rows` filas y pasa por la censura de secretos.
-- Cada sentencia queda registrada en la bitacora (`db_query`).
+- Cada sentencia queda registrada en la bitacora (`db_query`), con el SQL censurado.
 - `--db-write` habilita escritura y `--db-ddl` habilita DDL, ambos con tu
   confirmacion explicita y sobre la copia local.
 
@@ -135,8 +138,8 @@ sereno (Zen)**.
 | 12 | Entorno saneado | Los comandos reciben solo variables de entorno seguras (`agent/tools.py`) |
 | 13 | Bitacora encadenada | Cada registro incluye el hash del anterior; alterarlo rompe la cadena (`agent/audit.py`) |
 | 14 | Deny by default | Lo que no esta explicitamente permitido, se niega |
-| 15 | Base de datos solo local | Solo `127.0.0.1`/`localhost`/`::1`; una sentencia, sin comentarios, sin DDL por defecto (`agent/db.py`) |
-| 16 | Rollback verificado | Restaura respaldos solo dentro del workspace y comprueba el hash antes/despues (`agent/rollback.py`) |
+| 15 | Base de datos solo local | Solo `127.0.0.1`/`localhost`/`::1`; una sentencia, sin comentarios, sin lectura/escritura de archivos (`LOAD_FILE`, `INTO OUTFILE`), sin funciones de denegacion (`SLEEP`, `BENCHMARK`), sin DDL por defecto (`agent/db.py`) |
+| 16 | Rollback verificado | Exige una bitacora con cadena integra, restaura solo respaldos dentro de `backups/` y comprueba el hash antes/despues (`agent/rollback.py`) |
 | 17 | Identidad privada | `identity.json` es local y no se sube; arranca en blanco (`agent/identity.py`) |
 
 ## Estructura
@@ -157,7 +160,7 @@ agent/
   audit.py            Bitacora encadenada por hash
 profiles/             consulta.json, desarrollo.json, datos.json
 identity.example.json Plantilla de identidad (identity.json es privado)
-tests/                98 pruebas automatizadas
+tests/                108 pruebas automatizadas
 docs/                 Politica, amenazas, instalacion, checklist, mapeo, modelos
 opencode-integration/ Perfiles equivalentes para opencode (opcional)
 examples/demo-proyecto/ Proyecto con defectos para probar sin riesgo

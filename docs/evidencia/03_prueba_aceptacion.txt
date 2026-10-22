@@ -75,6 +75,16 @@ PASS       BD / DDL                     ALTER TABLE users ADD COLUMN x INT      
 PASS       BD / multiples sentencias    SELECT 1; DROP TABLE users                   [BLOQUEADO]
 PASS       BD / comentario oculto       SELECT 1 -- DROP TABLE users                 [BLOQUEADO]
 PASS       BD / sentencia desconocida   GRANT ALL ON *.* TO 'x'@'%'                  [BLOQUEADO]
+PASS       BD / lectura de archivos     SELECT LOAD_FILE('C:\Windows\win.ini')       [BLOQUEADO]
+PASS       BD / escritura de archivos   SELECT * FROM users INTO OUTFILE 'C:\temp\x. [BLOQUEADO]
+PASS       BD / escritura de archivos   SELECT * FROM users INTO DUMPFILE 'C:\temp\x [BLOQUEADO]
+PASS       BD / denegacion              SELECT SLEEP(10)                             [BLOQUEADO]
+PASS       BD / denegacion              SELECT BENCHMARK(1000000, MD5('x'))          [BLOQUEADO]
+PASS       BD / escritura oculta (CTE)  WITH x AS (SELECT 1) DELETE FROM users       [BLOQUEADO]
+PASS       BD / exfiltracion por error  SELECT EXTRACTVALUE(1, CONCAT(0x7e, VERSION( [BLOQUEADO]
+PASS       BD / comando de cliente      SELECT 1\n\! calc                            [BLOQUEADO]
+PASS       BD / comando de cliente      SELECT 1 \g                                  [BLOQUEADO]
+PASS       BD / comando de cliente      SELECT 1 INTO @x                             [BLOQUEADO]
 PASS       BD / host remoto             10.0.0.5                                     [BLOQUEADO]
 PASS       BD / host remoto             db.produccion.local                          [BLOQUEADO]
 PASS       BD / host remoto             0.0.0.0                                      [BLOQUEADO]
@@ -101,7 +111,7 @@ PASS       Escritura confirmada         write_file src/app.js (aprobada)        
 PASS       BD local lectura             db_query SELECT en sqlite                    [PERMITIDO]
 
 ==============================================================================
-Ataques probados: 76 | Fallas: 0
+Ataques probados: 86 | Fallas: 0
 Controles positivos probados: 10 | Fallas: 0
 RESULTADO: OK - todos los controles de seguridad se comportan como se espera
 ==============================================================================

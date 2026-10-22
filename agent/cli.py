@@ -398,6 +398,17 @@ def cmd_ask(args) -> int:
         return 0
 
 
+def _archivos_con_sesion(paths, session: str | None) -> list[Path]:
+    """Devuelve las bitacoras que contienen registros de esa sesion."""
+    if not session:
+        return []
+    encontrados: list[Path] = []
+    for path in paths:
+        if any(r.get("session") == session for r in load_records([path])):
+            encontrados.append(path)
+    return encontrados
+
+
 def cmd_rollback(args) -> int:
     _stdout("=" * 72)
     _stdout("ROLLBACK - restaurar desde los respaldos de la bitacora")
@@ -436,8 +447,16 @@ def cmd_rollback(args) -> int:
     if args.last:
         _stdout("[i] Modo --last: solo la ultima escritura de cada archivo.")
 
+    for path in _archivos_con_sesion(files, session):
+        ok, _, mensaje = verify_chain(path)
+        if not ok:
+            _stdout(f"[x] Bitacora no confiable ({path.name}): {mensaje}")
+            _stdout("[x] Rollback cancelado: la bitacora no pasa la verificacion de integridad.")
+            return 3
+
     acciones = build_actions(records, workspace, session=session or None,
-                             file_name=args.file or None, last_only=args.last)
+                             file_name=args.file or None, last_only=args.last,
+                             backups_root=audit_dir / "backups")
     if not acciones:
         _stdout("[i] No se encontraron cambios que revertir con esos criterios.")
         return 0

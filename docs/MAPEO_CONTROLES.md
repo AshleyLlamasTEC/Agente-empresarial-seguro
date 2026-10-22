@@ -86,6 +86,12 @@ codigo que lo implementa y a la prueba que lo demuestra.
 | Solo lectura por defecto | `agent/db.py: validate_sql` | `test_escritura_bloqueada_en_solo_lectura` |
 | DDL desactivado por defecto | idem | `test_ddl_bloqueado_por_defecto` |
 | Una sola sentencia, sin comentarios | idem | `test_una_sola_sentencia`, `test_sin_comentarios` |
+| Clasificacion sobre toda la sentencia | `agent/db.py: _DML_TOKEN` | `test_bloquea_escritura_oculta_en_cte` |
+| Sin lectura/escritura de archivos | `agent/db.py: _FORBIDDEN_SUBSTRINGS` | `test_bloquea_lectura_de_archivos` |
+| Sin funciones de denegacion | `agent/db.py: _FORBIDDEN_CALLS` | `test_bloquea_denegacion_de_servicio` |
+| Sin comandos de cliente MySQL | `agent/db.py: validate_sql` (engine) | `test_mysql_sin_comandos_de_cliente` |
+| Salida acotada (filas y bytes) | `run_sqlite` / `run_mysql` | `test_select_devuelve_filas` + revision de codigo |
+| SQL censurado en la bitacora | `agent/tools.py: _safe_sql` | `test_registra_en_bitacora` |
 | Sin acceso si el perfil no lo permite | `agent/tools.py: _db_query` | `test_perfil_sin_db_bloquea` |
 | Confirmacion por sentencia | `agent/tools.py: _db_query` | `test_rechazo_del_operador` |
 | Limite de filas y censura | `agent/db.py` + `agent/dlp.py` | `test_select_devuelve_filas` |
@@ -96,6 +102,8 @@ codigo que lo implementa y a la prueba que lo demuestra.
 | Control | Implementacion | Evidencia |
 |---------|----------------|-----------|
 | Reversion desde respaldos | `agent/rollback.py: build_actions` | `tests/test_rollback.py` |
+| Bitacora verificada antes de revertir | `agent/cli.py: cmd_rollback` | `test_bitacora_manipulada_cancela_rollback` |
+| Respaldo solo desde `backups/` | `agent/rollback.py: build_actions(backups_root)` | `test_respaldo_fuera_de_auditoria_se_omite` |
 | Confinado al workspace | `agent/rollback.py` + `agent/sandbox.py` | `test_rollback_fuera_del_workspace` |
 | Verificacion de hash antes/despues | `agent/rollback.py: apply_actions` | `test_rollback_restaura_hash` |
 | Bitacora del rollback | `agent/rollback.py` (perfil `rollback`) | `test_rollback_registra_en_bitacora` |

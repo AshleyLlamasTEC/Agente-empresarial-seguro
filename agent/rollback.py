@@ -28,6 +28,7 @@ class Action:
     expected_sha: str    # hash actual esperado (el de despues de lo que se deshace)
     original_sha: str    # hash al que se volvera
     writes: int = 1
+    note: str = ""
 
     @property
     def label(self) -> str:
@@ -78,8 +79,14 @@ def sessions_with_writes(records) -> list[str]:
 
 
 def build_actions(records, workspace: Path, session: str | None = None,
-                  file_name: str | None = None, last_only: bool = False) -> list[Action]:
-    """Calcula que hay que hacer para deshacer los cambios seleccionados."""
+                  file_name: str | None = None, last_only: bool = False,
+                  backups_root: Path | None = None) -> list[Action]:
+    """Calcula que hay que hacer para deshacer los cambios seleccionados.
+
+    Si se indica `backups_root`, solo se aceptan respaldos que esten dentro de esa
+    carpeta (la de respaldos de la bitacora). Asi una bitacora manipulada no puede
+    copiar archivos arbitrarios de la maquina hacia el workspace.
+    """
     events = write_events(records)
     if session:
         events = [e for e in events if e.get("session") == session]
@@ -101,17 +108,23 @@ def build_actions(records, workspace: Path, session: str | None = None,
         expected = last.get("sha256_after", "")
         backup_raw = base.get("respaldo") or ""
         backup = Path(backup_raw) if backup_raw else None
+        note = ""
 
         if backup is not None and backup.is_file():
-            mode = "restore"
+            if backups_root is not None and not _inside(backup, backups_root):
+                mode = "skip"
+                note = "el respaldo esta fuera del directorio de auditoria"
+            else:
+                mode = "restore"
         elif not original:
             mode = "delete"
         else:
             mode = "skip"
+            note = "sin respaldo disponible"
 
         actions.append(Action(target=Path(target), mode=mode, backup=backup,
                               expected_sha=expected, original_sha=original,
-                              writes=len(evs)))
+                              writes=len(evs), note=note))
     return actions
 
 
@@ -137,8 +150,9 @@ def apply_actions(actions, workspace: Path, audit, confirmer, out=print,
             continue
 
         if action.mode == "skip":
-            omitidas.append({"target": str(action.target), "motivo": "sin respaldo disponible"})
-            out(f"[!] Sin respaldo disponible, se omite: {action.target}")
+            motivo = action.note or "sin respaldo disponible"
+            omitidas.append({"target": str(action.target), "motivo": motivo})
+            out(f"[!] {motivo}, se omite: {action.target}")
             continue
 
         current = sha256_of(action.target)

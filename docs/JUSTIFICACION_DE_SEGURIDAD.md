@@ -1,8 +1,8 @@
-﻿# Dictamen de seguridad
+# Dictamen de seguridad
 
 ## Por que el Agente Empresarial Seguro no representa una amenaza para la empresa
 
-Version: 1.1.0
+Version: 1.1.1
 Preparado para: Gerencia, Seguridad de la Informacion y Auditoria.
 Documentos de soporte: `POLITICA_DE_SEGURIDAD.md`, `MODELO_DE_AMENAZAS.md`,
 `MAPEO_CONTROLES.md`, `MANUAL_DE_USO.md`.
@@ -48,7 +48,7 @@ Los tres hechos que sostienen este dictamen:
 | Una herramienta de apoyo a una persona | Un sistema autonomo de decision |
 | Una copia de trabajo aislada | Un agente conectado a los sistemas de la empresa |
 | Una bitacora de evidencia | Un proceso sin supervision |
-| 2 836 lineas de Python revisables | Caja negra de un proveedor externo |
+| 2 980 lineas de Python revisables | Caja negra de un proveedor externo |
 
 ---
 
@@ -149,8 +149,8 @@ borrado en el catalogo del agente.
 
 ### G. Se puede verificar sin confiar en quien lo desarrollo
 
-Auditoria puede reproducir las 98 pruebas automatizadas y ver el resultado. No
-se requiere revisar las 2 836 lineas leyendolas completas: las pruebas
+Auditoria puede reproducir las 108 pruebas automatizadas y ver el resultado. No
+se requiere revisar las 2 980 lineas leyendolas completas: las pruebas
 **intentan activamente** los escenarios de riesgo (escapar del sandbox,
 encadenar comandos, leer credenciales, alterar la bitacora) y demuestran que
 fallan.
@@ -207,7 +207,7 @@ una herramienta aprobada.
 | Pedirle a una IA en la nube que "arregle" y aplicar a ciegas | Cambios sin revision ni evidencia | Confirmacion humana + respaldo + bitacora |
 | Copiar la base de datos productiva "para probar" | Exposicion de datos de clientes | Prohibido; solo datos sinteticos |
 | Dar acceso de red al asistente | Ruta directa a produccion | Sin capacidad de red ni de BD |
-| Confiar en que el asistente "no hara nada malo" | Sin pruebas ni trazabilidad | 98 pruebas + bitacora encadenada |
+| Confiar en que el asistente "no hara nada malo" | Sin pruebas ni trazabilidad | 108 pruebas + bitacora encadenada |
 
 En terminos de riesgo de fuga de informacion, este agente es **estrictamente
 mas seguro que cualquier asistente de IA en la nube**, sin importar cuan
@@ -259,7 +259,7 @@ Auditoria puede comprobar este dictamen sin confiar en el proveedor. Cuatro
 comandos:
 
 ```powershell
-# 1. Las pruebas de seguridad (98) deben pasar
+# 1. Las pruebas de seguridad (108) deben pasar
 python -m unittest discover -s tests -t . -v
 #    Esperado: OK
 
@@ -311,7 +311,7 @@ apartado 9.
 | Rol | Responsabilidad |
 |-----|-----------------|
 | Operador | Ejecutar `doctor`, revisar cada confirmacion, conservar evidencia |
-| DueÃ±o del proyecto | Autorizar el uso sobre una copia y revisar los cambios |
+| Dueño del proyecto | Autorizar el uso sobre una copia y revisar los cambios |
 | TI / Seguridad de la Informacion | Verificar el aislamiento del equipo y el cumplimiento de las condiciones |
 | Auditoria | Ejecutar la verificacion independiente (apartado 10) y revisar bitacoras |
 | Gerencia | Autorizar y revisar periodicamente el cumplimiento de las condiciones |
@@ -322,7 +322,7 @@ apartado 9.
 |---|---|
 | Equipo | ______________________________ |
 | Operador responsable | ______________________________ |
-| Version del agente | 1.1.0 |
+| Version del agente | 1.1.1 |
 | Fecha de instalacion | ______________________________ |
 | Autorizado por | ______________________________ |
 | Firma y fecha | ______________________________ |

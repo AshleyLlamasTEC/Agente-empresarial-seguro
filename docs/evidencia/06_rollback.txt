@@ -1,15 +1,15 @@
 ROLLBACK DE LA SESION DE ESCRITURA
-Fecha: 2026-10-18T20:35:34.8028729-07:00
+Fecha: 2026-10-21T18:33:08.0034711-07:00
 
 === 1) PLAN DE ROLLBACK (--list) ===
 ========================================================================
 ROLLBACK - restaurar desde los respaldos de la bitacora
 ========================================================================
-[i] Sesion por defecto (la mas reciente): 20261019T033530Z
+[i] Sesion por defecto (la mas reciente): 20261022T013303Z
 
 PLAN DE ROLLBACK
 ------------------------------------------------------------------------
-  RESTAURAR C:\trabajo\pruebas\proyecto-prueba\app.js   (respaldo: app.js.20261019T033532905571.bak)
+  RESTAURAR C:\trabajo\pruebas\proyecto-prueba\app.js   (respaldo: app.js.20261022T013306046668.bak)
 ------------------------------------------------------------------------
 [i] Solo listado (--list). No se cambio nada.
 
@@ -17,13 +17,13 @@ PLAN DE ROLLBACK
 ========================================================================
 ROLLBACK - restaurar desde los respaldos de la bitacora
 ========================================================================
-[i] Sesion por defecto (la mas reciente): 20261019T033530Z
+[i] Sesion por defecto (la mas reciente): 20261022T013303Z
 
 PLAN DE ROLLBACK
 ------------------------------------------------------------------------
-  RESTAURAR C:\trabajo\pruebas\proyecto-prueba\app.js   (respaldo: app.js.20261019T033532905571.bak)
+  RESTAURAR C:\trabajo\pruebas\proyecto-prueba\app.js   (respaldo: app.js.20261022T013306046668.bak)
 ------------------------------------------------------------------------
-[i] Bitacora del rollback: C:\trabajo\pruebas\auditoria\20261019T033534Z-rollback-23756.jsonl
+[i] Bitacora del rollback: C:\trabajo\pruebas\auditoria\20261022T013307Z-rollback-11476.jsonl
 
 ======================================================================
 CONFIRMACION REQUERIDA

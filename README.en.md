@@ -104,8 +104,8 @@ python -m agent.cli setup
 | 12 | Sanitized environment | Commands receive only safe environment variables |
 | 13 | Hash-chained log | Each record carries the previous hash; tampering breaks the chain |
 | 14 | Deny by default | Anything not explicitly allowed is denied |
-| 15 | Local-only database | Only `127.0.0.1`/`localhost`/`::1`; one statement, no comments, no DDL by default |
-| 16 | Verified rollback | Restores backups inside the workspace and checks hashes |
+| 15 | Local-only database | Only `127.0.0.1`/`localhost`/`::1`; one statement, no comments, no file read/write (`LOAD_FILE`, `INTO OUTFILE`), no DoS functions (`SLEEP`, `BENCHMARK`), no DDL by default |
+| 16 | Verified rollback | Requires an intact log chain, restores only backups inside `backups/` and checks hashes before/after |
 | 17 | Private identity | `identity.json` stays local; starts blank |
 
 ## Structure
@@ -115,7 +115,7 @@ agent/                Core package (cli, config, identity, policy, sandbox, dlp,
                       db, rollback, ollama_client, tools, agent loop, audit)
 profiles/             consulta.json, desarrollo.json, datos.json
 identity.example.json Identity template (identity.json is private)
-tests/                98 automated tests
+tests/                108 automated tests
 docs/                 Policy, threats, install, checklist, mapping, models
 opencode-integration/ Equivalent opencode profiles (optional)
 examples/demo-proyecto/ Project with defects for safe testing

@@ -7,8 +7,8 @@ comando indicado; nada está escrito a mano.
 | Archivo | Qué demuestra | Cómo se regenera |
 | --- | --- | --- |
 | `01_doctor.txt` | El entorno está listo: Python, Ollama, modelo local y perfiles disponibles. | `python -X utf8 -m agent.cli doctor` |
-| `02_pruebas_unitarias.txt` | Las 98 pruebas automatizadas de política, sandbox, DLP, auditoría, bucle, identidad, rollback y base de datos local pasan. | `python -X utf8 -m unittest discover -s tests -t .` |
-| `03_prueba_aceptacion.txt` | Batería de ataques: 76 intentos de evasión bloqueados (0 fallas) y 10 controles positivos correctos. | `python -X utf8 scripts/prueba_aceptacion.py` |
+| `02_pruebas_unitarias.txt` | Las 108 pruebas automatizadas de política, sandbox, DLP, auditoría, bucle, identidad, rollback y base de datos local pasan. | `python -X utf8 -m unittest discover -s tests -t .` |
+| `03_prueba_aceptacion.txt` | Batería de ataques: 86 intentos de evasión bloqueados (0 fallas) y 10 controles positivos correctos. | `python -X utf8 scripts/prueba_aceptacion.py` |
 | `04_escritura_real.txt` | Ciclo completo real: `--dry-run` no modifica el archivo; con confirmación humana (`s`) sí lo modifica. | Ver sección "Reproducir la sesión de escritura". |
 | `05_verificacion.txt` | Respaldo automático, hashes SHA-256 antes/después, integridad de la bitácora y la diferencia aplicada. | Ver sección "Reproducir la sesión de escritura". |
 | `06_rollback.txt` | El cambio aplicado se deshace desde el respaldo: el archivo vuelve a su estado original con hash verificado. | Ver sección "Reproducir el rollback". |

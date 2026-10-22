@@ -51,6 +51,52 @@ class TestValidacionSQL(unittest.TestCase):
             validate_sql("SELECT 1\x00", read_only=True)
 
 
+class TestSQLPeligroso(unittest.TestCase):
+    def test_bloquea_lectura_de_archivos(self):
+        for sql in ("SELECT LOAD_FILE('/etc/passwd')",
+                    "SELECT * FROM t INTO OUTFILE '/tmp/x'",
+                    "SELECT * FROM t INTO DUMPFILE '/tmp/x'",
+                    "SELECT * FROM t INTO @variable"):
+            with self.assertRaises(DbError):
+                validate_sql(sql, read_only=True)
+
+    def test_bloquea_denegacion_de_servicio(self):
+        for sql in ("SELECT SLEEP(5)", "SELECT BENCHMARK(100000, MD5('x'))",
+                    "SELECT GET_LOCK('a', 10)",
+                    "SELECT EXTRACTVALUE(1, CONCAT(0x7e, VERSION()))"):
+            with self.assertRaises(DbError):
+                validate_sql(sql, read_only=True)
+
+    def test_bloquea_escritura_oculta_en_cte(self):
+        with self.assertRaises(DbError):
+            validate_sql("WITH x AS (SELECT 1) DELETE FROM t", read_only=True)
+        with self.assertRaises(DbError):
+            validate_sql("WITH x AS (SELECT 1) UPDATE t SET a = 1", read_only=True)
+        self.assertEqual(validate_sql("WITH x AS (SELECT 1) SELECT * FROM x",
+                                      read_only=True).kind, "read")
+
+    def test_mysql_sin_comandos_de_cliente(self):
+        for sql in ("SELECT 1\n\\! calc", "SELECT 1 \\g", "SELECT 1 \\; "):
+            with self.assertRaises(DbError):
+                validate_sql(sql, read_only=True, engine="mysql")
+        self.assertEqual(validate_sql("SELECT 'a\\b'", read_only=True,
+                                      engine="sqlite").kind, "read")
+
+    def test_funciones_de_lectura_no_se_confunden_con_escritura(self):
+        self.assertEqual(
+            validate_sql("SELECT REPLACE(nombre, 'a', 'b') FROM users",
+                         read_only=True).kind, "read")
+        self.assertEqual(
+            validate_sql("SELECT TRUNCATE(precio, 2) FROM productos",
+                         read_only=True).kind, "read")
+        with self.assertRaises(DbError):
+            validate_sql("SELECT * FROM users FOR UPDATE", read_only=True)
+
+    def test_caracteres_de_control(self):
+        with self.assertRaises(DbError):
+            validate_sql("SELECT 1\x07", read_only=True)
+
+
 class TestHost(unittest.TestCase):
     def test_host_local(self):
         for host in ("127.0.0.1", "localhost", "::1"):
@@ -156,6 +202,21 @@ class TestHerramientaDbQuery(unittest.TestCase):
         runner = self._runner()
         result = runner.call("db_query", {"engine": "mysql", "database": "job_itm",
                                           "host": "10.0.0.9", "sql": "SELECT 1"})
+        self.assertTrue(result.blocked)
+
+    def test_puerto_invalido_bloqueado(self):
+        runner = self._runner()
+        result = runner.call("db_query", {"engine": "mysql", "database": "job_itm",
+                                          "port": "abc", "sql": "SELECT 1"})
+        self.assertTrue(result.blocked)
+        result = runner.call("db_query", {"engine": "mysql", "database": "job_itm",
+                                          "port": 99999, "sql": "SELECT 1"})
+        self.assertTrue(result.blocked)
+
+    def test_nombre_de_base_invalido_bloqueado(self):
+        runner = self._runner()
+        result = runner.call("db_query", {"engine": "mysql", "database": "../otra",
+                                          "sql": "SELECT 1"})
         self.assertTrue(result.blocked)
 
     def test_fuera_del_workspace_bloqueado(self):

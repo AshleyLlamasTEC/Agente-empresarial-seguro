@@ -22,6 +22,15 @@ from .dlp import is_sensitive_path, redact
 from .policy import check_command, check_path
 from .sandbox import SandboxError, resolve_in_workspace
 
+DB_IDENTIFIER = re.compile(r"[A-Za-z0-9_.$-]{1,64}")
+
+
+def _safe_sql(sql) -> str:
+    """Censura secretos antes de guardar la sentencia en la bitacora."""
+    if not isinstance(sql, str):
+        return ""
+    return redact(sql)[0]
+
 SKIP_DIRS = {
     ".git", ".hg", ".svn", "node_modules", "__pycache__", ".venv", "venv", "env",
     "dist", "build", ".next", ".nuxt", "target", ".idea", ".vscode", "coverage",
@@ -133,10 +142,12 @@ class ToolRunner:
         if self.profile.allow_db:
             modo = "solo lectura" if self.profile.db_read_only else "lectura y escritura"
             lines.append(
-                '- db_query   args: {"engine": "sqlite", "database": "datos/local.db", '
+                '- db_query   args: {"engine": "sqlite", "database": "local.db", '
                 '"sql": "SELECT * FROM users LIMIT 10"}   Base de datos LOCAL '
-                f"({modo}). Tambien engine 'mysql' con database/host/port/user. "
-                "Una sentencia, sin comentarios. Requiere tu confirmacion."
+                f"({modo}). 'database' es la ruta del archivo .db/.sqlite RELATIVA al "
+                "workspace (no inventes carpetas). Tambien engine 'mysql' con "
+                "database/host/port/user. Una sentencia, sin comentarios. "
+                "Requiere tu confirmacion."
             )
         lines.append('- final      args: {"answer": "texto"}          Termina y entrega el resultado.')
         return "\n".join(lines)
@@ -494,12 +505,15 @@ class ToolRunner:
 
         engine = str(args.get("engine", "sqlite")).strip().lower()
         sql = args.get("sql", "")
+        if engine not in {"sqlite", "mysql"}:
+            return ToolResult(False, "Motor no soportado. Usa 'sqlite' o 'mysql'.")
 
         try:
             decision = validate_sql(sql, read_only=self.profile.db_read_only,
-                                    allow_ddl=self.profile.db_allow_ddl)
+                                    allow_ddl=self.profile.db_allow_ddl, engine=engine)
         except DbError as exc:
-            self.audit.record("db_blocked", {"engine": engine, "motivo": str(exc), "sql": sql})
+            self.audit.record("db_blocked", {"engine": engine, "motivo": str(exc),
+                                             "sql": _safe_sql(sql)})
             return ToolResult(False, str(exc), blocked=True)
 
         try:
@@ -508,30 +522,37 @@ class ToolRunner:
                 guard = self._guard(db_path)
                 if guard:
                     return guard
-                target = f"sqlite://{db_path}"
+                target = f"sqlite://{db_path.name}"
                 params = {"database": db_path}
-            elif engine == "mysql":
+            else:
                 host = check_local_host(str(args.get("host") or "127.0.0.1"))
-                port = int(args.get("port") or 3306)
+                try:
+                    port = int(args.get("port") or 3306)
+                except (TypeError, ValueError):
+                    raise DbError("El puerto debe ser un numero.")
+                if not 1 <= port <= 65535:
+                    raise DbError("Puerto fuera de rango (1-65535).")
                 user = str(args.get("user") or os.environ.get("AGENT_DB_USER") or "root")
                 database = str(args.get("database") or "")
-                if not database:
-                    raise DbError("Falta 'database' (nombre de la base).")
+                if not DB_IDENTIFIER.fullmatch(database):
+                    raise DbError("Nombre de base invalido o ausente.")
+                if not DB_IDENTIFIER.fullmatch(user):
+                    raise DbError("Usuario de base invalido.")
                 password = os.environ.get("AGENT_DB_PASSWORD", "")
                 target = f"mysql://{user}@{host}:{port}/{database}"
                 params = {"host": host, "port": port, "user": user,
                           "password": password, "database": database}
-            else:
-                return ToolResult(False, "Motor no soportado. Usa 'sqlite' o 'mysql'.")
         except DbError as exc:
-            self.audit.record("db_blocked", {"engine": engine, "motivo": str(exc), "sql": sql})
+            self.audit.record("db_blocked", {"engine": engine, "motivo": str(exc),
+                                             "sql": _safe_sql(sql)})
             return ToolResult(False, str(exc), blocked=True)
 
         etiqueta = {"read": "LECTURA", "write": "ESCRITURA", "ddl": "DDL"}[decision.kind]
+        sql_audit = _safe_sql(decision.sql)
 
         if self.dry_run:
             self.audit.record("db_dry_run", {"engine": engine, "target": target,
-                                             "kind": decision.kind, "sql": decision.sql})
+                                             "kind": decision.kind, "sql": sql_audit})
             return ToolResult(
                 True,
                 f"[SIMULACION EXITOSA] Modo simulacion activo: no se ejecuto nada. "
@@ -541,7 +562,7 @@ class ToolRunner:
 
         descripcion = f"EJECUTAR SQL ({etiqueta}) en {target}:\n  {decision.sql}"
         if not self._confirm(descripcion):
-            self.audit.record("db_denied_by_user", {"target": target, "sql": decision.sql})
+            self.audit.record("db_denied_by_user", {"target": target, "sql": sql_audit})
             return ToolResult(False, "El operador rechazo la consulta.", blocked=True)
 
         started = time.perf_counter()
@@ -556,9 +577,12 @@ class ToolRunner:
                                               params["password"], params["database"],
                                               decision.sql,
                                               timeout=self.profile.command_timeout_seconds,
-                                              env=safe_env())
+                                              env=safe_env(),
+                                              max_bytes=max(65536,
+                                                            self.profile.max_output_chars * 4))
         except DbError as exc:
-            self.audit.record("db_blocked", {"engine": engine, "target": target, "motivo": str(exc)})
+            self.audit.record("db_blocked", {"engine": engine, "target": target,
+                                             "motivo": str(exc)})
             return ToolResult(False, str(exc), blocked=True)
 
         elapsed = round((time.perf_counter() - started) * 1000, 2)
@@ -566,7 +590,7 @@ class ToolRunner:
         self.audit.record(
             "db_query",
             {"engine": engine, "target": target, "kind": decision.kind,
-             "sql": decision.sql, "rows": filas, "ok": ok, "ms": elapsed},
+             "sql": sql_audit, "rows": filas, "ok": ok, "ms": elapsed},
         )
         cuerpo = f"$ {decision.sql}\nen {target} ({etiqueta}, {elapsed} ms, filas: {filas})"
         if salida.strip():

@@ -108,6 +108,19 @@ ATTACK_SQL = [
     ("BD / multiples sentencias", "SELECT 1; DROP TABLE users"),
     ("BD / comentario oculto", "SELECT 1 -- DROP TABLE users"),
     ("BD / sentencia desconocida", "GRANT ALL ON *.* TO 'x'@'%'"),
+    ("BD / lectura de archivos", "SELECT LOAD_FILE('C:\\Windows\\win.ini')"),
+    ("BD / escritura de archivos", "SELECT * FROM users INTO OUTFILE 'C:\\temp\\x.txt'"),
+    ("BD / escritura de archivos", "SELECT * FROM users INTO DUMPFILE 'C:\\temp\\x.bin'"),
+    ("BD / denegacion", "SELECT SLEEP(10)"),
+    ("BD / denegacion", "SELECT BENCHMARK(1000000, MD5('x'))"),
+    ("BD / escritura oculta (CTE)", "WITH x AS (SELECT 1) DELETE FROM users"),
+    ("BD / exfiltracion por error", "SELECT EXTRACTVALUE(1, CONCAT(0x7e, VERSION()))"),
+]
+
+ATTACK_SQL_MYSQL = [
+    ("BD / comando de cliente", "SELECT 1\n\\! calc"),
+    ("BD / comando de cliente", "SELECT 1 \\g"),
+    ("BD / comando de cliente", "SELECT 1 INTO @x"),
 ]
 
 ATTACK_DB_HOSTS = [
@@ -202,6 +215,15 @@ def main() -> int:
         except DbError:
             bloqueado = True
         negativos.add(categoria, sql[:44], bloqueado, True)
+
+    for categoria, sql in ATTACK_SQL_MYSQL:
+        try:
+            validate_sql(sql, read_only=datos.db_read_only, allow_ddl=datos.db_allow_ddl,
+                         engine="mysql")
+            bloqueado = False
+        except DbError:
+            bloqueado = True
+        negativos.add(categoria, sql.replace("\n", "\\n")[:44], bloqueado, True)
 
     for categoria, host in ATTACK_DB_HOSTS:
         try:

@@ -151,6 +151,45 @@ class TestRollback(unittest.TestCase):
         apply_actions(acciones, self.ws, audit2, lambda _d: True, out=lambda *a: None)
         self.assertEqual(self.app.read_text(encoding="utf-8"), "ORIGINAL\n")
 
+    def test_respaldo_fuera_de_auditoria_se_omite(self):
+        secreto = self.root / "secreto.txt"
+        secreto.write_text("SECRETO\n", encoding="utf-8")
+        records = [{
+            "event": "write_file",
+            "session": "s1",
+            "data": {
+                "path": str(self.app),
+                "sha256_before": "antes",
+                "sha256_after": "despues",
+                "respaldo": str(secreto),
+            },
+        }]
+        acciones = build_actions(records, self.ws, session="s1",
+                                 backups_root=self.audit_dir / "backups")
+        self.assertEqual(acciones[0].mode, "skip")
+        self.assertIn("auditoria", acciones[0].note)
+
+    def test_bitacora_manipulada_cancela_rollback(self):
+        import argparse
+        import contextlib
+        import io
+
+        from agent import cli
+
+        audit_path, _ = self._escribir("V1\n")
+        texto = audit_path.read_text(encoding="utf-8")
+        audit_path.write_text(texto.replace('"seq":1', '"seq":99', 1), encoding="utf-8")
+
+        args = argparse.Namespace(workspace=str(self.ws), audit_dir=str(self.audit_dir),
+                                  session=None, file=None, last=False, list=True,
+                                  dry_run=False, yes=True, force=False)
+        salida = io.StringIO()
+        with contextlib.redirect_stdout(salida):
+            codigo = cli.cmd_rollback(args)
+        self.assertEqual(codigo, 3)
+        self.assertIn("no pasa la verificacion", salida.getvalue())
+        self.assertEqual(self.app.read_text(encoding="utf-8"), "V1\n")
+
     def test_bitacora_del_rollback_es_verificable(self):
         from agent.audit import verify_chain
         audit_path, _ = self._escribir("V1\n")

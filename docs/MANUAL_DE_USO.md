@@ -1,6 +1,6 @@
 # Manual de uso - Agente Empresarial Seguro
 
-Version: 1.1.0
+Version: 1.1.1
 Dirigido a: operadores del agente (desarrolladores, TI, soporte tecnico).
 Documentos relacionados: `GUIA_INSTALACION.md`, `POLITICA_DE_SEGURIDAD.md`,
 `CHECKLIST_AUDITORIA.md`.
@@ -101,9 +101,14 @@ local** y por medio de la herramienta `db_query`:
   `mysql` en el PATH).
 - Por defecto **solo lectura**: `SELECT`, `EXPLAIN` y `PRAGMA`. Escribir o
   cambiar el esquema exige activarlo a proposito (`--db-write`, `--db-ddl`).
-- Una sola sentencia por vez y **sin comentarios** (evita trucos de ocultamiento).
-- El resultado se limita a `db_max_rows` filas y pasa por la censura de secretos.
-- Cada consulta pide tu confirmacion y queda en la bitacora (`db_query`).
+- Una sola sentencia por vez, **sin comentarios** y **sin funciones peligrosas**
+  (`LOAD_FILE`, `INTO OUTFILE`, `SLEEP`, `BENCHMARK`, ...). Tambien se detecta la
+  escritura escondida en CTEs (`WITH ... DELETE`). En MySQL la sentencia debe ser
+  una sola linea y sin `\` (el cliente interpretaria comandos de cliente).
+- El resultado se limita a `db_max_rows` filas (y a un maximo de bytes en MySQL)
+  y pasa por la censura de secretos.
+- Cada consulta pide tu confirmacion y queda en la bitacora (`db_query`) con el
+  SQL **censurado**.
 
 > La base de datos **de produccion no se toca nunca**: no es alcanzable (host
 > remoto bloqueado) y no debe haber credenciales reales en la maquina.
@@ -319,6 +324,10 @@ Aplicar? [s/N]:
 
 - `--list` solo muestra el plan (no cambia nada).
 - `--dry-run` tambien simula sin tocar el disco.
+- **Antes de aplicar, el comando verifica la cadena de la bitacora.** Si fue
+  alterada, cancela el rollback (codigo 3) en lugar de confiar en ella.
+- Solo restaura respaldos que esten dentro de la carpeta `backups/` de la
+  bitacora; si un registro apunta a otro sitio, lo omite.
 - Cada restauracion queda en la bitacora; el rollback tambien es reversible.
 
 ### 5.10 `ask` con base de datos local (perfil `datos`)
@@ -426,6 +435,9 @@ Un bloqueo **no es una falla**: es un control funcionando. Queda registrado.
 | `BLOQUEADO: Escritura en BD en modo solo lectura` | `DELETE`/`UPDATE`/`INSERT` sin habilitarlo | Usa solo lectura; si es imprescindible, `--db-write` |
 | `BLOQUEADO: DDL no permitido` | `CREATE`/`DROP`/`ALTER` sin habilitarlo | Usa `--db-ddl` solo sobre la copia |
 | `BLOQUEADO: Una sola sentencia por consulta` | Intento de encadenar SQL con `;` | Divide la consulta |
+| `Contenido prohibido en la sentencia` | `LOAD_FILE`, `INTO OUTFILE`, `SLEEP`, ... | No hay vuelta: es una funcion prohibida |
+| `En MySQL la sentencia debe ser una sola linea y sin '\'` | Intento de inyectar comandos del cliente `mysql` | Envia una sola linea sin barras invertidas |
+| `Rollback cancelado: la bitacora no pasa la verificacion` | Alguien manipulo la bitacora | No revertir; reporta a seguridad |
 | `Metacaracter de shell prohibido` | Intentaba encadenar con `;`, `&&`, `\|` | Prohibido; pide cambios via escritura de archivo |
 | `Ollama no responde` | Servicio detenido | Ejecuta `ollama serve` |
 | `El modelo no esta descargado` | Falta el pull | `ollama pull qwen2.5-coder:7b` |

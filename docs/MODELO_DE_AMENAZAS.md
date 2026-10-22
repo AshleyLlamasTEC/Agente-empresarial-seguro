@@ -91,21 +91,27 @@ agente solo ejecuta lo que el operador confirma.
 `agent/policy.py`.
 
 ### T10 - Exfiltracion o dano a traves de la base de datos
-**Vector:** conectar a un motor remoto (produccion) o lanzar SQL destructivo
-(`DROP`, `DELETE`) dentro de la sesion.
+**Vector:** conectar a un motor remoto (produccion), leer/escribir archivos desde
+SQL (`LOAD_FILE`, `INTO OUTFILE`), agotar el servidor (`SLEEP`, `BENCHMARK`) o
+colar una escritura en una CTE (`WITH ... DELETE`).
 **Mitigacion:** solo hosts locales (`check_local_host`); motor por herramienta
-dedicada (`db_query`), no por comando; una sentencia sin comentarios; solo lectura
-por defecto; DDL y escritura requieren bandera explicita y confirmacion por
-sentencia; cada consulta queda en la bitacora.
+dedicada (`db_query`), no por comando; una sentencia sin comentarios; clasificacion
+sobre la sentencia COMPLETA; funciones peligrosas prohibidas; en MySQL una sola
+linea sin `\` (comandos de cliente); solo lectura por defecto; DDL y escritura
+requieren bandera explicita y confirmacion por sentencia; salida acotada en filas
+y bytes; SQL censurado en la bitacora.
 **Evidencia:** `agent/db.py`, `agent/tools.py`, pruebas `test_host_remoto_bloqueado`,
-`test_escritura_bloqueada_en_solo_lectura`, `test_rechazo_del_operador`.
+`test_bloquea_lectura_de_archivos`, `test_bloquea_denegacion_de_servicio`,
+`test_bloquea_escritura_oculta_en_cte`, `test_mysql_sin_comandos_de_cliente`.
 
 ### T11 - Encubrimiento mediante el rollback
-**Vector:** usar `rollback` para revertir una escritura y ocultar que ocurrio.
-**Mitigacion:** el rollback solo restaura **respaldos que ya existen** y verifica
-el hash antes y despues; confinado al workspace; deja su propio registro en la
-bitacora (perfil `rollback`), por lo que el evento original sigue siendo visible.
-**Evidencia:** `agent/rollback.py`, `tests/test_rollback.py`.
+**Vector:** usar `rollback` para revertir una escritura y ocultar que ocurrio, o
+manipular la bitacora para que restaure un respaldo ajeno.
+**Mitigacion:** el rollback verifica la cadena antes de aplicar; solo restaura
+respaldos que esten dentro de `backups/` de la bitacora; confinado al workspace;
+verifica el hash antes y despues; deja su propio registro en la bitacora.
+**Evidencia:** `agent/rollback.py`, `agent/cli.py`, pruebas
+`test_bitacora_manipulada_cancela_rollback`, `test_respaldo_fuera_de_auditoria_se_omite`.
 
 ## 4. Riesgos residuales (declaracion honesta)
 

@@ -1,6 +1,6 @@
-﻿# Politica de seguridad del Agente Empresarial Seguro
+# Politica de seguridad del Agente Empresarial Seguro
 
-Version: 1.1.0
+Version: 1.1.1
 Ambito: uso del agente de IA local para analisis y correccion de codigo.
 Aplicable a: cualquier persona que opere el agente en equipos de la empresa.
 
@@ -72,7 +72,7 @@ Queda prohibido:
 
 - **Operador:** ejecutar `doctor` antes de cada sesion, revisar cada
   confirmacion, no aprobar cambios que no entienda.
-- **DueÃ±o del proyecto:** autorizar el uso sobre una copia y revisar los
+- **Dueño del proyecto:** autorizar el uso sobre una copia y revisar los
   cambios antes de integrarlos al repositorio oficial.
 - **Auditoria/TI:** verificar los controles, revisar las bitacoras y validar el
   aislamiento de la maquina.

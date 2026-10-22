@@ -31,6 +31,7 @@ Se recomienda imprimir o guardar este documento firmado y fechado por sesion.
 ## Antes de integrar cambios al repositorio oficial
 
 - [ ] Los cambios fueron revisados por una persona.
+- [ ] Si se uso `rollback`, la bitacora paso la verificacion de integridad antes de revertir.
 - [ ] Las pruebas del proyecto pasan en la copia.
 - [ ] No se integro ninguna credencial ni dato real.
 - [ ] Los cambios se integran por el flujo normal (revision de codigo), no directo a produccion.
